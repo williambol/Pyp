@@ -5,23 +5,23 @@ on:
       - '*'
 jobs:
   publish:
-    name: Publish for ${{ matrix.os }} for ${{ matrix.architecture }}
+    name: Publish for ${{ matrix.os }} on ${{ matrix.architecture }}
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         include:
           - os: macos-latest
-            artifact_name: Pyp
             architecture: osx-x64
             asset_name: pyp-intel
+            file: /Users/runner/work/Pyp/Pyp/Pyp/bin/Release/net8.0/osx-x64/publish/Pyp
           - os: macos-latest
-            artifact_name: Pyp
             architecture: osx-arm64
             asset_name: pyp-apple-silicon
+            file: /Users/runner/work/Pyp/Pyp/Pyp/bin/Release/net8.0/osx-arm64/publish/Pyp
           - os: windows-latest
-            artifact_name: Pyp.exe
             architecture: win-x64
             asset_name: pyp-windows64
+            file: D:\a\Pyp\Pyp\Pyp\bin\Release\net8.0\win-x64\publish\Pyp.exe
             
     steps:
       - uses: actions/checkout@v4
@@ -34,6 +34,6 @@ jobs:
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: /Users/runner/work/Pyp/Pyp/Pyp/bin/Release/net8.0/${{ matrix.architecture }}/publish/${{ matrix.artifact_name }}
+          file: ${{ matrix.file }}
           asset_name: ${{ matrix.asset_name }}
           tag: ${{ github.ref }}
