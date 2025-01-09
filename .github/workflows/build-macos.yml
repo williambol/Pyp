@@ -28,7 +28,7 @@ jobs:
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 8.x
-      - run: dotnet restore
+      - run: dotnet restore -r ${{ matrix.architecture }}
       - run: dotnet publish -r ${{ matrix.architecture }} --no-restore -c Release /p:AssemblyVersion=${{ github.ref_name }} /p:Version=${{ github.ref_name }}
       - name: Upload binaries to release
         uses: svenstaro/upload-release-action@v2
