@@ -20,7 +20,7 @@ jobs:
             file: /Users/runner/work/Pyp/Pyp/Pyp/bin/Release/net8.0/osx-arm64/publish/Pyp
           - os: windows-latest
             architecture: win-x64
-            asset_name: pyp-windows64
+            asset_name: pyp-windows64.exe
             file: D:\a\Pyp\Pyp\Pyp\bin\Release\net8.0\win-x64\publish\Pyp.exe
             
     steps:
