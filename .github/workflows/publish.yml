@@ -12,19 +12,22 @@ jobs:
         include:
           - os: macos-latest
             architecture: osx-x64
-            asset_name: pyp-intel
+            asset_name: pyp-intel.zip
             file: /Users/runner/work/Pyp/Pyp/Pyp/bin/Release/net8.0/osx-x64/publish/Pyp
             fileName: Pyp
+            zipCommand: zip
           - os: macos-latest
             architecture: osx-arm64
-            asset_name: pyp-apple-silicon
+            asset_name: pyp-apple-silicon.zip
             file: /Users/runner/work/Pyp/Pyp/Pyp/bin/Release/net8.0/osx-arm64/publish/Pyp
             fileName: Pyp
+            zipCommand: zip
           - os: windows-latest
             architecture: win-x64
-            asset_name: pyp-windows64.exe
+            asset_name: pyp-windows64.zip
             file: D:\a\Pyp\Pyp\Pyp\bin\Release\net8.0\win-x64\publish\Pyp.exe
             fileName: Pyp.exe
+            zipCommand: tar.exe -a -c -f
             
     steps:
       - uses: actions/checkout@v4
@@ -33,9 +36,9 @@ jobs:
           dotnet-version: 8.x
       - run: dotnet restore -r ${{ matrix.architecture }}
       - run: dotnet publish -r ${{ matrix.architecture }} --no-restore -c Release /p:AssemblyVersion=${{ github.ref_name }} /p:Version=${{ github.ref_name }}
-      - run: mkdir release/
-      - run: mv ${{ matrix.file }} release/${{ matrix.fileName}}
-      - run: zip -r release.zip release
+      - run: mkdir pyp/
+      - run: mv ${{ matrix.file }} pyp/${{ matrix.fileName}}
+      - run: ${{ matrix.zipCommand }} -r release.zip pyp
       - name: Upload binaries to release
         uses: svenstaro/upload-release-action@v2
         with:
