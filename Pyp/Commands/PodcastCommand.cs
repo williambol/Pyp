@@ -1,13 +1,16 @@
 using System.CommandLine;
 using System.ServiceModel.Syndication;
+using Microsoft.Extensions.Logging;
 using Pyp.Binders;
 using Pyp.Services;
 using Spectre.Console;
 
 namespace Pyp.Commands;
 
-public class PodcastCommand : RootCommand
+public partial class PodcastCommand : RootCommand
 {
+    private ILogger _logger;
+    
     private readonly Dictionary<string, string> _mimeTypes = new (StringComparer.OrdinalIgnoreCase)
     {
         { "audio/mpeg", ".mp3" },
@@ -17,13 +20,17 @@ public class PodcastCommand : RootCommand
         { "audio/aac", ".aac" }
     };
     
-    public PodcastCommand() : base("Some description")
+    public PodcastCommand(ILoggerFactory loggerFactory) : base("Some description")
     {
+        _logger = loggerFactory.CreateLogger<PodcastCommand>();
+        
+        LogStartupMessage(_logger);
+        
         var feedOption = new Option<string?>(
             name: "--feed",
             description: "The feed of the podcast to have its episodes downloaded.");
 
-        this.SetHandler(ReadFeed, feedOption, new PodcastServiceBinder());
+        this.SetHandler(ReadFeed, feedOption, new PodcastServiceBinder(loggerFactory));
     }
     
     private async Task ReadFeed(string? feed, IPodcastService podcastService)
@@ -34,8 +41,11 @@ public class PodcastCommand : RootCommand
         if (!Uri.TryCreate(feed, UriKind.Absolute, out Uri? uri))
         {
             AnsiConsole.MarkupLine("[red]Invalid podcast feed.[/]");
+            LogInvalidFeed(_logger, feed);
             return;
         }
+        
+        LogFeed(_logger, uri);
 
         SyndicationFeed? podcastFeed = null;
         
@@ -47,7 +57,9 @@ public class PodcastCommand : RootCommand
 
         if (podcastFeed == null)
         {
-            AnsiConsole.MarkupLine("[red]Failed to load podcast feed.[/]");
+            AnsiConsole.MarkupLine("[red]Failed to load podcast feed. Please ensure the uri points to a valid feed.[/]");
+            LogInvalidRssFeed(_logger, feed);
+            return;
         }
     
         AnsiConsole.MarkupLine($"[green]Found Podcast with title: {podcastFeed?.Title.Text} and {podcastFeed?.Items.Count()} episodes.[/]");
@@ -63,6 +75,8 @@ public class PodcastCommand : RootCommand
                 .AddChoiceGroup(new SyndicationItem("All", null, null), podcastFeed?.Items.ToList() ?? [])
                 .UseConverter(item => item.Title.Text));
         
+        LogSelectedEpisodes(_logger, selectedItems.Count);
+        
         var currentDirectory = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
         var downloadDirectory = Path.Combine(currentDirectory, "PYP", podcastFeed?.Title.Text ?? "Downloads");
         var downloadDirectoryInfo = new DirectoryInfo(downloadDirectory);
@@ -75,6 +89,7 @@ public class PodcastCommand : RootCommand
         downloadDirectoryInfo.Create();
         
         AnsiConsole.MarkupLine($"Downloading to {downloadDirectory}");
+        LogDownloadDirectory(_logger, downloadDirectory);
         
         await AnsiConsole.Progress()
             .Columns(new TaskDescriptionColumn(), new ProgressBarColumn(), new PercentageColumn(), new RemainingTimeColumn(), new SpinnerColumn())
@@ -111,10 +126,15 @@ public class PodcastCommand : RootCommand
 
                     var downloadFile = new FileInfo(Path.Combine(downloadDirectory, $"{selectedItem.Title.Text}{_mimeTypes[enclosure.MediaType.ToLower()]}"));
 
+                    LogDownloadingFile(_logger, downloadFile.ToString());
+                    
                     await podcastService.DownloadEpisode(enclosure.Uri.ToString(), downloadFile, progress);
                     
                     task.StopTask();
                 }
             });
+        
+        LogDone(_logger);
+        AnsiConsole.MarkupLine("[green] Done, you may now close this window.[/]");
     }
 }

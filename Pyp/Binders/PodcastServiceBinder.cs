@@ -1,6 +1,7 @@
 using System.CommandLine.Binding;
 using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.Http.Resilience;
+using Microsoft.Extensions.Logging;
 using Polly;
 using Pyp.Services;
 
@@ -8,6 +9,13 @@ namespace Pyp.Binders;
 
 public class PodcastServiceBinder : BinderBase<IPodcastService>
 {
+    private readonly ILoggerFactory _loggerFactory;
+    
+    public PodcastServiceBinder(ILoggerFactory loggerFactory)
+    {
+        _loggerFactory = loggerFactory;
+    }
+    
     [Experimental("EXTEXP0001")]
     protected override IPodcastService GetBoundValue(BindingContext bindingContext) =>
         GetPodcastService(bindingContext);
@@ -34,6 +42,6 @@ public class PodcastServiceBinder : BinderBase<IPodcastService>
 
         var httpClient = new HttpClient(resilienceHandler);
         
-        return new PodcastService(httpClient);
+        return new PodcastService(_loggerFactory.CreateLogger<PodcastService>(), httpClient);
     }
 }
