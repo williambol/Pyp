@@ -1,0 +1,36 @@
+<sukiUi:SukiWindow xmlns="https://github.com/avaloniaui"
+                   xmlns:sukiUi="clr-namespace:SukiUI.Controls;assembly=SukiUI"
+                   xmlns:theme="clr-namespace:SukiUI.Theme;assembly=SukiUI"
+                   xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                   xmlns:vm="using:Pyp.Gui.ViewModels"
+                   xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                   xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                   xmlns:views="clr-namespace:Pyp.Gui.Views"
+                   mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+                   x:Class="Pyp.Gui.Views.MainWindow"
+                   x:DataType="vm:MainWindowViewModel"
+                   Icon="/Assets/avalonia-logo.ico"
+                   Title="Pyp.Gui">
+
+    <Design.DataContext>
+        <!-- This only sets the DataContext for the previewer in an IDE,
+             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
+        <vm:MainWindowViewModel/>
+    </Design.DataContext>
+    
+    <Grid VerticalAlignment="Stretch" HorizontalAlignment="Stretch" RowDefinitions="Auto,10,*" Margin="10">
+        <sukiUi:GlassCard Grid.Row="0" IsAnimated="False">
+            <Grid ColumnDefinitions="*,10,Auto">
+                <TextBox Grid.Column="0" Text="{Binding Feed}" Watermark="Enter Podcast Feed URL"/>
+                <Button Grid.Column="2" Content="Load"
+                        Command="{Binding LoadFeedCommand}"
+                        CommandParameter="{Binding Feed}"
+                        theme:ButtonExtensions.ShowProgress="{Binding IsLoading}"/>
+            </Grid>
+        </sukiUi:GlassCard>
+        <TextBlock Grid.Row="2" IsVisible="{Binding !IsPodcastSelected}">Load podcast above</TextBlock>
+        <sukiUi:GlassCard Grid.Row="2" IsVisible="{Binding IsPodcastSelected}" IsAnimated="False">
+            <views:PodcastDetails DataContext="{Binding SelectedPodcast}"/>
+        </sukiUi:GlassCard>
+    </Grid>
+</sukiUi:SukiWindow>
