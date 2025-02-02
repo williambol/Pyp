@@ -1,11 +1,11 @@
 using Microsoft.Extensions.Logging;
 
-namespace Pyp.Services;
+namespace Pyp.Cli.Services;
 
 public partial class PodcastService
 {
     [LoggerMessage(Level = LogLevel.Information, Message = "Fetching podcast. feed=\"{uri}\"")]
-    static partial void LogFetchingPodcast(ILogger logger, Uri uri);
+    static partial void LogFetchingPodcast(ILogger logger, string uri);
     
     [LoggerMessage(Level = LogLevel.Error, Message = "Error while fetching podcast.")]
     static partial void LogErrorFetchingPodcast(ILogger logger, Exception ex);

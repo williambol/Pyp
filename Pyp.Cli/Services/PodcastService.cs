@@ -1,29 +1,29 @@
 using System.ServiceModel.Syndication;
 using System.Xml;
 using Microsoft.Extensions.Logging;
-using Pyp.Extensions;
+using Pyp.Cli.Extensions;
 using Exception = System.Exception;
 
-namespace Pyp.Services;
+namespace Pyp.Cli.Services;
 
 public partial class PodcastService : IPodcastService
 {
     private readonly HttpClient _httpClient;
     private readonly ILogger _logger;
 
-    public PodcastService(ILogger logger, HttpClient httpClient)
+    public PodcastService(ILogger<PodcastService> logger, HttpClient httpClient)
     {
         _httpClient = httpClient;
         _logger = logger;
     }
     
-    public Task<SyndicationFeed?> GetPodcastFeed(Uri url)
+    public Task<SyndicationFeed?> GetPodcastFeed(string uri)
     {
-        LogFetchingPodcast(_logger, url);
+        LogFetchingPodcast(_logger, uri);
         SyndicationFeed? feed = null;
         try
         {
-            XmlReader reader = XmlReader.Create(url.ToString());
+            XmlReader reader = XmlReader.Create(uri);
             feed = SyndicationFeed.Load(reader);
             reader.Close();
             reader.Dispose();

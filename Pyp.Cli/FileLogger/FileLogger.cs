@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Logging;
 
-namespace Pyp.FileLogger;
+namespace Pyp.Cli.FileLogger;
 
 public class FileLogger : ILogger
 {

@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Logging;
 
-namespace Pyp.Commands;
+namespace Pyp.Cli.Commands;
 
 public partial class PodcastCommand
 {
@@ -8,7 +8,7 @@ public partial class PodcastCommand
     static partial void LogStartupMessage(ILogger logger);
     
     [LoggerMessage(Level = LogLevel.Information, Message = "Fetching feed. feed=\"{feedUri}\"")]
-    static partial void LogFeed(ILogger logger, Uri feedUri);
+    static partial void LogFeed(ILogger logger, string feedUri);
     
     [LoggerMessage(Level = LogLevel.Error, Message = "The input feed could not be converted to uri. Shutting down. feed=\"{feedUri}\"")]
     static partial void LogInvalidFeed(ILogger logger, string feedUri);

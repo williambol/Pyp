@@ -1,0 +1,97 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:Pyp.Gui.ViewModels"
+             xmlns:asyncImageLoader="clr-namespace:AsyncImageLoader;assembly=AsyncImageLoader.Avalonia"
+             xmlns:suki="https://github.com/kikipoulet/SukiUI"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:DataType="vm:PodcastViewModel"
+             x:Class="Pyp.Gui.Views.PodcastDetails">
+    <Design.DataContext>
+        <!-- This only sets the DataContext for the previewer in an IDE,
+             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
+        <vm:PodcastViewModel/>
+    </Design.DataContext>
+    <Grid ColumnDefinitions="*" RowDefinitions="Auto,10,Auto,10,*">
+        <Grid Grid.Row="0" RowDefinitions="Auto,10,*" ColumnDefinitions="Auto,10,*" Height="{Binding HeaderHeight}">
+            <Image Width="{Binding HeaderHeight}" Height="{Binding HeaderHeight}" Grid.Column="0" Grid.RowSpan="3" Grid.Row="0" asyncImageLoader:ImageLoader.Source="{Binding ImageUri}"/>
+            <TextBlock Grid.Column="2" Grid.Row="0" VerticalAlignment="Center">
+                <Run Text="{Binding Title}" FontWeight="Bold" FontSize="24"/> • <Run Text="{Binding Authors}" FontSize="20"/>
+            </TextBlock>
+            <ScrollViewer Grid.Column="2" Grid.Row="2" HorizontalScrollBarVisibility="Disabled">
+                <TextBlock TextWrapping="Wrap"
+                           Text="{Binding Description}"/>
+            </ScrollViewer>
+        </Grid>
+        <Grid Grid.Row="2" RowDefinitions="Auto" ColumnDefinitions="Auto,10,Auto,10,Auto">
+            <TextBlock Grid.Column="0" VerticalAlignment="Center">
+                <Run Text="{Binding PodcastEpisodes.Count}" /> Episodes
+            </TextBlock>
+            <CheckBox Grid.Column="2" Command="{Binding SelectAllCommand}" IsThreeState="True" IsChecked="{Binding IsAllSelected}">Select All</CheckBox>
+            <Button Grid.Column="4" Content="Download Selected"
+                    Command="{Binding DownloadSelectedCommand}"
+                    suki:ButtonExtensions.ShowProgress="{Binding IsDownloading}"/>
+        </Grid>
+        <ItemsControl Grid.Row="4" ItemsSource="{Binding PodcastEpisodes}" IsVisible="{Binding !IsDownloading}">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Grid RowDefinitions="*,10,2*" ColumnDefinitions="100,10,*,10,50" Height="100" Margin="10">
+                        <Image Width="100" Grid.Column="0" Grid.RowSpan="3" Grid.Row="0" asyncImageLoader:ImageLoader.Source="{Binding ImageUri}"/>
+                        <TextBlock Grid.Row="0" Grid.Column="2"
+                                   Text="{Binding Title}" />
+                        <TextBlock Grid.Row="2" Grid.Column="2" TextWrapping="Wrap"
+                                   Text="{Binding Description}"/>
+                        <CheckBox Grid.Column="4" Grid.Row="0" Grid.RowSpan="3" IsChecked="{Binding ShouldDownload}" />
+                    </Grid>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <VirtualizingStackPanel />
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.Template>
+                <ControlTemplate TargetType="ItemsControl">
+                    <Border BorderThickness="{TemplateBinding BorderThickness}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            Background="{TemplateBinding Background}">
+                        <ScrollViewer Padding="{TemplateBinding Padding}"
+                                      Focusable="False">
+                            <ItemsPresenter />
+                        </ScrollViewer>
+                    </Border>
+                </ControlTemplate>
+            </ItemsControl.Template>
+        </ItemsControl>
+        <ItemsControl Grid.Row="4" ItemsSource="{Binding DownloadEpisodes}" IsVisible="{Binding IsDownloading}">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Grid RowDefinitions="*,10,2*" ColumnDefinitions="100,10,*" Height="100" Margin="10">
+                        <Image Width="100" Grid.Column="0" Grid.RowSpan="3" Grid.Row="0" asyncImageLoader:ImageLoader.Source="{Binding ImageUri}"/>
+                        <TextBlock Grid.Row="0" Grid.Column="2"
+                                   Text="{Binding Title}" />
+                        <ProgressBar Grid.Row="2" Grid.Column="2" IsIndeterminate="False" ShowProgressText="True" Value="{Binding Progress}"/>
+                    </Grid>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <VirtualizingStackPanel />
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.Template>
+                <ControlTemplate TargetType="ItemsControl">
+                    <Border BorderThickness="{TemplateBinding BorderThickness}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            Background="{TemplateBinding Background}">
+                        <ScrollViewer Padding="{TemplateBinding Padding}"
+                                      Focusable="False">
+                            <ItemsPresenter />
+                        </ScrollViewer>
+                    </Border>
+                </ControlTemplate>
+            </ItemsControl.Template>
+        </ItemsControl>
+    </Grid>
+</UserControl>

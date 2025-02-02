@@ -3,9 +3,9 @@ using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.Http.Resilience;
 using Microsoft.Extensions.Logging;
 using Polly;
-using Pyp.Services;
+using Pyp.Cli.Services;
 
-namespace Pyp.Binders;
+namespace Pyp.Cli.Binders;
 
 public class PodcastServiceBinder : BinderBase<IPodcastService>
 {

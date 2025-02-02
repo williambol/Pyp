@@ -1,4 +1,4 @@
-namespace Pyp.Extensions;
+namespace Pyp.Cli.Extensions;
 
 public static class HttpClientExtensions
 {

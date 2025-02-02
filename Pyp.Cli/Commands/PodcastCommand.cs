@@ -1,11 +1,11 @@
 using System.CommandLine;
 using System.ServiceModel.Syndication;
 using Microsoft.Extensions.Logging;
-using Pyp.Binders;
-using Pyp.Services;
+using Pyp.Cli.Binders;
+using Pyp.Cli.Services;
 using Spectre.Console;
 
-namespace Pyp.Commands;
+namespace Pyp.Cli.Commands;
 
 public partial class PodcastCommand : RootCommand
 {
@@ -38,21 +38,21 @@ public partial class PodcastCommand : RootCommand
         feed ??= AnsiConsole.Prompt(
             new TextPrompt<string>("What is the podcast feed?"));
         
-        if (!Uri.TryCreate(feed, UriKind.Absolute, out Uri? uri))
+        if (!Uri.IsWellFormedUriString(feed, UriKind.Absolute))
         {
             AnsiConsole.MarkupLine("[red]Invalid podcast feed.[/]");
             LogInvalidFeed(_logger, feed);
             return;
         }
         
-        LogFeed(_logger, uri);
+        LogFeed(_logger, feed);
 
         SyndicationFeed? podcastFeed = null;
         
         await AnsiConsole.Status()
             .StartAsync("Loading...", async _ => 
             {
-                podcastFeed = await podcastService.GetPodcastFeed(uri);
+                podcastFeed = await podcastService.GetPodcastFeed(feed);
             });
 
         if (podcastFeed == null)
